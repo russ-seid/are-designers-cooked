@@ -555,7 +555,9 @@ function getRange(tf) {
   const nowISO = now.toISOString();
 
   if (tf === 'today') {
-    return { from: startOfDay(now), to: nowISO, label: human(now) };
+    // Free GNews has 12h delay — look at last 36h to catch today's delayed articles
+    const s = new Date(now); s.setHours(now.getHours() - 36);
+    return { from: s.toISOString(), to: now.toISOString(), label: human(now) };
   }
   if (tf === 'yesterday') {
     const y = new Date(now); y.setDate(now.getDate() - 1);
@@ -666,19 +668,22 @@ function animateScore(target) {
 }
 
 async function fetchGNews(query, from, to) {
-  const params = new URLSearchParams({ q: query, from, to });
-  const url = '/api/gnews?' + params;
-  console.log('[GNews] fetching:', query, '|', from, '→', to);
-  const res = await fetch(url);
+  const params = new URLSearchParams({ q: query });
+  const res = await fetch('/api/gnews?' + params);
   const body = await res.json().catch(() => ({}));
-  console.log('[GNews] response for "' + query + '":', res.status, body);
   if (!res.ok) {
     const err = new Error(body.errors?.[0] || 'GNews error ' + res.status);
     err.status = res.status;
-    err.body = body;
     throw err;
   }
-  return body.articles || [];
+  // Filter articles by date on our side since free plan has 12h delay
+  const articles = body.articles || [];
+  const fromMs = new Date(from).getTime();
+  const toMs   = new Date(to).getTime();
+  return articles.filter(a => {
+    const t = new Date(a.publishedAt).getTime();
+    return t >= fromMs && t <= toMs;
+  });
 }
 
 function dedupeArticles(articles) {
