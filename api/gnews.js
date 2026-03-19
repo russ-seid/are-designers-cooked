@@ -1,33 +1,23 @@
 export default async function handler(req, res) {
-  const { q, from, to } = req.query;
+  const { q } = req.query;
 
-  console.log('GNews proxy called with:', { q, from, to });
-
-  if (!q || !from || !to) {
-    console.error('Missing params:', { q, from, to });
-    return res.status(400).json({ error: 'Missing required params: q, from, to' });
+  if (!q) {
+    return res.status(400).json({ error: 'Missing required param: q' });
   }
 
   const params = new URLSearchParams({
     q,
     lang: 'en',
-    max: '5',
-    from,
-    to,
+    max: '10',
     sortby: 'publishedAt',
     token: '5c79a5bb0e1e709423f7835d3a7e6400',
   });
 
-  const gnewsUrl = 'https://gnews.io/api/v4/search?' + params;
-  console.log('Fetching GNews:', gnewsUrl);
-
   try {
-    const response = await fetch(gnewsUrl);
+    const response = await fetch('https://gnews.io/api/v4/search?' + params);
     const data = await response.json();
-    console.log('GNews responded:', response.status, JSON.stringify(data).slice(0, 200));
     return res.status(response.status).json(data);
   } catch (err) {
-    console.error('GNews fetch failed:', err.message);
     return res.status(500).json({ error: err.message });
   }
 }
