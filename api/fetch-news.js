@@ -16,14 +16,10 @@ const REDDIT_SEARCHES = [
 ];
 
 const RSS_FEEDS = [
-  {
-    name: 'The Verge',
-    url: 'https://www.theverge.com/rss/index.xml',
-  },
-  {
-    name: 'TechCrunch',
-    url: 'https://techcrunch.com/feed/',
-  },
+  { name: 'The Verge - AI', url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml' },
+  { name: 'TechCrunch - AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/' },
+  { name: 'Creative Bloq', url: 'https://www.creativebloq.com/feeds/all' },
+  { name: 'Design Milk', url: 'https://design-milk.com/feed/' },
 ];
 
 // ── Scoring signals ────────────────────────────────────────
@@ -169,7 +165,19 @@ async function fetchRSS(feed) {
   return articles;
 }
 
-// ── Scoring ────────────────────────────────────────────────
+// Keywords that must appear in title or description for article to be considered
+const RELEVANCE_KEYWORDS = [
+  'design', 'designer', 'figma', 'adobe', 'canva', 'midjourney', 'dall-e',
+  'ai tool', 'generative ai', 'creative ai', 'ux', 'ui ', 'graphic',
+  'illustrat', 'motion design', 'brand', 'visual', 'artwork', 'creative tool',
+  'stable diffusion', 'image generation', 'text to image', 'ai image',
+  'google stitch', 'framer', 'runway', 'sora', 'layout', 'prototype',
+];
+
+function isRelevant(article) {
+  const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+  return RELEVANCE_KEYWORDS.some(kw => text.includes(kw));
+}
 
 function matchesAny(text, keywords) {
   return keywords.some(kw => text.includes(kw));
@@ -266,7 +274,7 @@ export default async function handler(req, res) {
     const allArticles = [];
 
     const addArticles = (results, label) => {
-      let added = 0, skippedDate = 0, skippedDupe = 0, failed = 0;
+      let added = 0, skippedDate = 0, skippedDupe = 0, skippedIrrelevant = 0, failed = 0;
       for (const r of results) {
         if (r.status !== 'fulfilled') {
           console.warn(`[fetch-news] ${label} source failed:`, r.reason?.message);
@@ -278,12 +286,13 @@ export default async function handler(req, res) {
           if (seen.has(article.url)) { skippedDupe++; continue; }
           const t = new Date(article.publishedAt).getTime();
           if (t < from.getTime()) { skippedDate++; continue; }
+          if (!isRelevant(article)) { skippedIrrelevant++; continue; }
           seen.add(article.url);
           allArticles.push(article);
           added++;
         }
       }
-      console.log(`[fetch-news] ${label}: +${added} articles (skipped ${skippedDate} too old, ${skippedDupe} dupes, ${failed} failed sources)`);
+      console.log(`[fetch-news] ${label}: +${added} articles (skipped ${skippedDate} too old, ${skippedIrrelevant} irrelevant, ${skippedDupe} dupes, ${failed} failed)`);
     };
 
     addArticles(gnewsResults, 'GNews');
