@@ -251,14 +251,12 @@ export default async function handler(req, res) {
 
   try {
     const now  = new Date();
-    const from = new Date(now.getTime() - 36 * 60 * 60 * 1000);
+    const from = new Date(now.getTime() - 72 * 60 * 60 * 1000);
 
     // Run all sources in parallel
-    const [gnewsResults, redditResults, rssResults] = await Promise.all([
+    const [gnewsResults, rssResults] = await Promise.all([
       // GNews — 3 queries in parallel
       Promise.allSettled(GNEWS_QUERIES.map(q => fetchGNews(q))),
-      // Reddit — 4 subreddit searches in parallel
-      Promise.allSettled(REDDIT_SEARCHES.map(s => fetchReddit(s.subreddit, s.query))),
       // RSS feeds in parallel
       Promise.allSettled(RSS_FEEDS.map(f => fetchRSS(f))),
     ]);
@@ -289,10 +287,13 @@ export default async function handler(req, res) {
     };
 
     addArticles(gnewsResults, 'GNews');
-    addArticles(redditResults, 'Reddit');
     addArticles(rssResults, 'RSS');
 
     console.log(`[fetch-news] Total: ${allArticles.length} articles in window`);
+    // Log first 5 titles to see what we're working with
+    allArticles.slice(0, 8).forEach((a, i) =>
+      console.log(`[fetch-news] Article ${i+1}: [${a.source}] ${a.title}`)
+    );
 
     const analysis = analyzeHeadlines(allArticles);
     const relevantArticles = allArticles
