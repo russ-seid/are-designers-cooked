@@ -1,7 +1,7 @@
 async function kvGet(key) {
-  const url = `${process.env.UPSTASH_REDIS_REST_URL}/get/${key}`;
+  const url = `${process.env.KV_REST_API_URL}/get/${key}`;
   const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}` },
+    headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}` },
   });
   if (!res.ok) return null;
   const data = await res.json();
