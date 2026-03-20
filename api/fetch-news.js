@@ -1,26 +1,50 @@
 const GNEWS_KEY = '5c79a5bb0e1e709423f7835d3a7e6400';
 
+// ── Source definitions ─────────────────────────────────────
+
 const GNEWS_QUERIES = [
   'AI design tool released',
   'designer layoffs AI',
   'AI replace designer',
 ];
 
+const REDDIT_SEARCHES = [
+  { subreddit: 'artificial', query: 'designer AI tool' },
+  { subreddit: 'graphic_design', query: 'AI replace designer' },
+  { subreddit: 'web_design', query: 'AI design' },
+  { subreddit: 'userexperience', query: 'AI designer' },
+];
+
+const RSS_FEEDS = [
+  {
+    name: 'The Verge',
+    url: 'https://www.theverge.com/rss/index.xml',
+  },
+  {
+    name: 'TechCrunch',
+    url: 'https://techcrunch.com/feed/',
+  },
+];
+
+// ── Scoring signals ────────────────────────────────────────
 const SIGNALS = {
   tool_major: {
     tools: ['figma', 'adobe firefly', 'adobe', 'canva', 'midjourney', 'dall-e', 'dall·e',
             'stable diffusion', 'framer', 'galileo', 'uizard', 'leonardo', 'runway',
-            'microsoft designer', 'google design', 'sketch', 'invision', 'protopie',
-            'spline', 'pika', 'sora', 'ideogram', 'recraft'],
+            'microsoft designer', 'google stitch', 'google design', 'sketch', 'invision',
+            'protopie', 'spline', 'pika', 'sora', 'ideogram', 'recraft', 'lovart',
+            'design ai', 'ai designer'],
     actions: ['launch', 'releases', 'released', 'introduce', 'announce', 'unveil',
-              'rolls out', 'roll out', 'ships', 'debuts', 'drops', 'just dropped'],
+              'rolls out', 'roll out', 'ships', 'debuts', 'drops', 'just dropped',
+              'launched', 'introduced', 'announced'],
     score: 22,
   },
   tool_minor: {
     tools: ['figma', 'adobe', 'canva', 'midjourney', 'dall-e', 'framer', 'galileo',
-            'uizard', 'leonardo', 'runway', 'sketch', 'ai design', 'generative design'],
+            'uizard', 'leonardo', 'runway', 'sketch', 'ai design', 'generative design',
+            'google stitch', 'design tool'],
     actions: ['update', 'adds', 'added', 'new feature', 'improves', 'expands',
-              'integrates', 'plugin', 'beta', 'ai-powered', 'powered by ai'],
+              'integrates', 'plugin', 'beta', 'ai-powered', 'powered by ai', 'updated'],
     score: 12,
   },
   layoffs: {
@@ -28,15 +52,16 @@ const SIGNALS = {
               'studio clos', 'shutter', 'shut down', 'downsiz', 'workforce reduc',
               'position eliminat', 'retrench', 'restructur', 'headcount'],
     context: ['design', 'designer', 'creative', 'ux', 'ui', 'agency', 'studio',
-              'art director', 'illustrator', 'motion'],
+              'art director', 'illustrator', 'motion', 'graphic'],
     score: 32,
   },
   replacement: {
     phrases: ['replac', 'ai instead of designer', 'no longer need designer',
               'designer obsolete', 'ai beats designer', 'ai beat designer',
-              'ai-generated design', 'ai over designer', 'ai took', 'without designer',
-              'ai does the design', 'ai doing design', 'fired their designer',
-              'replaced their designer', 'ditched their designer'],
+              'ai-generated design', 'designers are cooked', 'designer is cooked',
+              'designers cooked', 'ai took', 'without designer', 'ai does the design',
+              'fired their designer', 'replaced their designer', 'ditched their designer',
+              'designers are finished', 'end of designers', 'ai will replace designer'],
     score: 18,
   },
 };
@@ -45,7 +70,7 @@ const SUMMARIES = {
   safe: [
     "The robots clocked out early today. Designers across the world can unclench — no major AI announcements, no layoffs, no existential crises. Enjoy it while it lasts.",
     "Surprisingly quiet on the AI front. Either the tech overlords are on vacation, or they're just charging up for something bigger. Either way, designers live to kern another day.",
-    "Nothing to report. The design industry is intact, Figma hasn't dropped a bombshell, and no one declared designers obsolete today. A miracle, frankly.",
+    "Nothing to report. The design industry is intact, no one dropped a bombshell, and no one declared designers obsolete today. A miracle, frankly.",
   ],
   warm: [
     "A few ripples in the pond, but nothing catastrophic. Some AI news is floating around but it's not the apocalypse — just a gentle reminder that the robots are still watching.",
@@ -67,6 +92,84 @@ const SUMMARIES = {
     "The score speaks for itself. Today delivered a near-perfect storm of bad design industry news. We had a good run, folks.",
   ],
 };
+
+// ── Fetchers ───────────────────────────────────────────────
+
+async function fetchGNews(query) {
+  const params = new URLSearchParams({
+    q: query, lang: 'en', max: '10', sortby: 'publishedAt', token: GNEWS_KEY,
+  });
+  const r = await fetch('https://gnews.io/api/v4/search?' + params);
+  const data = await r.json();
+  return (data.articles || []).map(a => ({
+    title:       a.title || '',
+    description: a.description || '',
+    url:         a.url,
+    source:      a.source?.name || 'GNews',
+    publishedAt: a.publishedAt,
+  }));
+}
+
+async function fetchReddit(subreddit, query) {
+  const params = new URLSearchParams({
+    q: query, sort: 'new', t: 'week', limit: '15', restrict_sr: '1',
+  });
+  const url = `https://www.reddit.com/r/${subreddit}/search.json?` + params;
+  const r = await fetch(url, {
+    headers: { 'User-Agent': 'are-designers-cooked/1.0' },
+  });
+  const data = await r.json();
+  const posts = data?.data?.children || [];
+  return posts.map(p => ({
+    title:       p.data.title || '',
+    description: p.data.selftext?.slice(0, 200) || '',
+    url:         'https://reddit.com' + p.data.permalink,
+    source:      'Reddit r/' + subreddit,
+    publishedAt: new Date(p.data.created_utc * 1000).toISOString(),
+  }));
+}
+
+// Simple XML tag extractor — no external parser needed
+function extractTags(xml, tag) {
+  const results = [];
+  const re = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gi');
+  let m;
+  while ((m = re.exec(xml)) !== null) results.push(m[1].trim());
+  return results;
+}
+
+function stripCDATA(str) {
+  return str.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').trim();
+}
+
+async function fetchRSS(feed) {
+  const r = await fetch(feed.url, {
+    headers: { 'User-Agent': 'are-designers-cooked/1.0' },
+  });
+  const xml = await r.text();
+
+  const titles      = extractTags(xml, 'title').map(stripCDATA);
+  const links       = extractTags(xml, 'link').map(stripCDATA);
+  const descs       = extractTags(xml, 'description').map(stripCDATA);
+  const pubDates    = extractTags(xml, 'pubDate').map(stripCDATA);
+  const updatedDates = extractTags(xml, 'updated').map(stripCDATA);
+
+  const articles = [];
+  // Skip index 0 — it's the feed title, not an article
+  for (let i = 1; i < titles.length; i++) {
+    const pub = pubDates[i] || updatedDates[i] || new Date().toISOString();
+    articles.push({
+      title:       titles[i] || '',
+      description: descs[i] || '',
+      url:         links[i] || '',
+      source:      feed.name,
+      publishedAt: new Date(pub).toISOString(),
+    });
+  }
+  return articles;
+}
+
+// ── Scoring ────────────────────────────────────────────────
 
 function matchesAny(text, keywords) {
   return keywords.some(kw => text.includes(kw));
@@ -122,6 +225,8 @@ function analyzeHeadlines(articles) {
   return { score: totalScore, summary, relevant };
 }
 
+// ── KV ────────────────────────────────────────────────────
+
 async function kvSet(key, value) {
   const url = `${process.env.KV_REST_API_URL}/set/${key}`;
   const res = await fetch(url, {
@@ -135,6 +240,8 @@ async function kvSet(key, value) {
   return res.ok;
 }
 
+// ── Main handler ───────────────────────────────────────────
+
 export default async function handler(req, res) {
   const isVercelCron = req.headers['x-vercel-cron'] === '1';
   const secret = req.query.secret || req.headers['x-cron-secret'];
@@ -144,39 +251,53 @@ export default async function handler(req, res) {
 
   try {
     const now  = new Date();
-    const from = new Date(now.getTime() - 36 * 60 * 60 * 1000).toISOString();
+    const from = new Date(now.getTime() - 36 * 60 * 60 * 1000);
 
-    const fetches = await Promise.allSettled(
-      GNEWS_QUERIES.map(async q => {
-        const params = new URLSearchParams({ q, lang: 'en', max: '10', sortby: 'publishedAt', token: GNEWS_KEY });
-        const r = await fetch('https://gnews.io/api/v4/search?' + params);
-        const data = await r.json();
-        return data.articles || [];
-      })
-    );
+    // Run all sources in parallel
+    const [gnewsResults, redditResults, rssResults] = await Promise.all([
+      // GNews — 3 queries in parallel
+      Promise.allSettled(GNEWS_QUERIES.map(q => fetchGNews(q))),
+      // Reddit — 4 subreddit searches in parallel
+      Promise.allSettled(REDDIT_SEARCHES.map(s => fetchReddit(s.subreddit, s.query))),
+      // RSS feeds in parallel
+      Promise.allSettled(RSS_FEEDS.map(f => fetchRSS(f))),
+    ]);
 
+    // Collect all articles
     const seen = new Set();
     const allArticles = [];
-    for (const f of fetches) {
-      if (f.status === 'fulfilled') {
-        for (const article of f.value) {
-          if (!seen.has(article.url)) {
-            seen.add(article.url);
-            const t = new Date(article.publishedAt).getTime();
-            if (t >= new Date(from).getTime()) allArticles.push(article);
-          }
+
+    const addArticles = (results) => {
+      for (const r of results) {
+        if (r.status !== 'fulfilled') {
+          console.warn('[fetch-news] Source failed:', r.reason?.message);
+          continue;
+        }
+        for (const article of r.value) {
+          if (!article.url || seen.has(article.url)) continue;
+          // Filter to time window
+          const t = new Date(article.publishedAt).getTime();
+          if (t < from.getTime()) continue;
+          seen.add(article.url);
+          allArticles.push(article);
         }
       }
-    }
+    };
+
+    addArticles(gnewsResults);
+    addArticles(redditResults);
+    addArticles(rssResults);
+
+    console.log(`[fetch-news] Articles collected: ${allArticles.length} (from ${seen.size} unique sources)`);
 
     const analysis = analyzeHeadlines(allArticles);
     const relevantArticles = allArticles
       .filter((_, i) => analysis.relevant.includes(i))
-      .slice(0, 5)
+      .slice(0, 6)
       .map(a => ({
         title:       a.title,
         url:         a.url,
-        source:      a.source?.name || '',
+        source:      a.source,
         publishedAt: a.publishedAt,
       }));
 
@@ -190,11 +311,11 @@ export default async function handler(req, res) {
 
     await kvSet('latest_result', result);
 
-    console.log(`[fetch-news] Done. Score: ${result.score}, Articles: ${result.total}`);
+    console.log(`[fetch-news] Done. Score: ${result.score}, Total: ${result.total}, Relevant: ${relevantArticles.length}`);
     return res.status(200).json({ ok: true, result });
 
   } catch (err) {
-    console.error('[fetch-news] Error:', err);
+    console.error('[fetch-news] Fatal error:', err);
     return res.status(500).json({ error: err.message });
   }
 }
