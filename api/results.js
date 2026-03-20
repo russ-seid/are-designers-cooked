@@ -9,54 +9,7 @@ const RSS_FEEDS = [
   { name: 'Creative Bloq',   url: 'https://www.creativebloq.com/feeds/all' },
 ];
 
-// ── Scoring signals ────────────────────────────────────────
-const SIGNALS = {
-  tool_major: {
-    tools: ['figma', 'adobe firefly', 'firefly', 'adobe', 'canva', 'midjourney', 'dall-e', 'dall·e',
-            'stable diffusion', 'framer', 'galileo', 'uizard', 'leonardo', 'runway',
-            'microsoft designer', 'google stitch', 'stitch', 'vibe design', 'google design',
-            'sketch', 'invision', 'protopie', 'spline', 'pika', 'sora', 'ideogram',
-            'recraft', 'lovart', 'design ai', 'ai designer', 'nvidia', 'dlss'],
-    actions: ['launch', 'releases', 'released', 'introduce', 'announce', 'unveil',
-              'rolls out', 'roll out', 'ships', 'debuts', 'drops', 'just dropped',
-              'launched', 'introduced', 'announced', 'new model', 'new version',
-              'custom model', 'new tool', 'new feature', 'now available', 'just launched'],
-    score: 22,
-  },
-  tool_minor: {
-    tools: ['figma', 'adobe', 'firefly', 'canva', 'midjourney', 'dall-e', 'framer', 'galileo',
-            'uizard', 'leonardo', 'runway', 'sketch', 'ai design', 'generative design',
-            'google stitch', 'design tool', 'creative tool', 'ai art', 'ai image',
-            'image generation', 'text to image', 'generative ai'],
-    actions: ['update', 'adds', 'added', 'new feature', 'improves', 'expands',
-              'integrates', 'plugin', 'beta', 'ai-powered', 'powered by ai', 'updated',
-              'tame ai', 'using ai', 'with ai', 'ai model', 'ai tool', 'can ai'],
-    score: 12,
-  },
-  layoffs: {
-    primary: ['layoff', 'laid off', 'lay off', 'job cut', 'redundan', 'let go',
-              'studio clos', 'shutter', 'shut down', 'downsiz', 'workforce reduc',
-              'position eliminat', 'retrench', 'restructur', 'headcount',
-              'job loss', 'firing', 'fired', 'cut jobs', 'cutting jobs'],
-    context: ['design', 'designer', 'creative', 'ux', 'ui', 'agency', 'studio',
-              'art director', 'illustrator', 'motion', 'graphic', 'brand',
-              'visual', 'product designer', 'web designer', 'animator',
-              'creative director', 'design team', 'design department'],
-    score: 32,
-  },
-  replacement: {
-    phrases: ['replac', 'ai instead of designer', 'no longer need designer',
-              'designer obsolete', 'ai beats designer', 'ai beat designer',
-              'ai-generated design', 'designers are cooked', 'designer is cooked',
-              'designers cooked', 'ai took', 'without designer', 'ai does the design',
-              'fired their designer', 'replaced their designer', 'ditched their designer',
-              'designers are finished', 'end of designers', 'ai will replace designer',
-              'do we need designers', 'designers becoming obsolete', 'kill design jobs',
-              'no need for designers', 'designers out of work', 'ai killing design',
-              'death of design', 'designers unemployed', 'vibe design'],
-    score: 18,
-  },
-};
+// ── Three categories that count ───────────────────────────
 
 const SUMMARIES = {
   safe: [
@@ -85,82 +38,139 @@ const SUMMARIES = {
   ],
 };
 
-// ── Relevance filters ──────────────────────────────────────
-const RELEVANCE_KEYWORDS = [
-  'ux designer', 'ui designer', 'graphic designer', 'product designer',
-  'web designer', 'motion designer', 'interaction designer', 'visual designer',
-  'art director', 'creative director', 'brand designer', 'designer',
-  'user experience', 'user interface', 'ux design', 'ui design',
-  'graphic design', 'motion design', 'web design', 'product design',
-  'interaction design', 'design system', 'design tool', 'design software',
-  'wireframe', 'prototype', 'design workflow', 'design industry',
-  'figma', 'sketch', 'framer', 'webflow', 'canva', 'invision', 'zeplin',
-  'illustrator', 'photoshop', 'indesign', 'after effects', 'protopie', 'spline',
-  'midjourney', 'dall-e', 'stable diffusion', 'firefly', 'adobe firefly',
-  'runway ml', 'ideogram', 'recraft', 'lovart', 'google stitch',
-  'microsoft designer', 'vibe design',
-  'designers are cooked', 'designer layoff', 'design layoff',
-  'ai replace designer', 'ai replacing designer', 'design jobs',
+// ── Three categories that count ───────────────────────────
+//
+// CAT 1: AI tools that improve design process
+// CAT 2: Vibe-coding tools
+// CAT 3: Design/creative layoffs
+// CAT 4: AI replacing creative roles broadly
+
+const DESIGN_AI_TOOLS = [
+  // Design-specific AI tools
+  'figma', 'adobe firefly', 'firefly', 'adobe', 'canva', 'framer',
+  'sketch', 'webflow', 'protopie', 'spline', 'invision', 'zeplin',
+  'midjourney', 'dall-e', 'dall·e', 'stable diffusion', 'ideogram',
+  'recraft', 'lovart', 'leonardo ai', 'runway', 'pika', 'sora',
+  'microsoft designer', 'google stitch', 'adobe express',
+  'uizard', 'galileo ai', 'magician', 'diagram',
+  // New design AI tools
+  'gamma', 'relume', 'creatie', 'coframe', 'attention insight',
+  'khroma', 'fontjoy', 'remove.bg', 'clipdrop',
+  // AI video — threatens motion designers
+  'kling', 'hailuo', 'luma dream machine', 'dream machine',
+  // General AI when in design context
+  'gemini', 'chatgpt', 'claude',
+
+  // Vibe-coding / AI UI builders
+  'v0', 'bolt', 'lovable', 'cursor', 'replit', 'github copilot',
+  'vibe coding', 'vibe-coding', 'vibe design', 'vibe-design',
+  'no-code', 'ai builder', 'ai website builder', 'ai ui',
+  'ai frontend', 'ai layout', 'ai component',
+  // More vibe-coding tools
+  'tempo', 'windsurf', 'devin', 'vercel v0',
+  'supabase', 'ai code editor',
 ];
 
-const PH_RELEVANCE_KEYWORDS = [
-  'figma', 'ui design', 'ux design', 'graphic design', 'web design',
-  'design tool', 'design system', 'design asset', 'design template',
-  'ui kit', 'icon pack', 'font tool', 'typography tool', 'color tool',
-  'wireframe', 'prototype tool', 'mockup tool', 'logo maker',
-  'canva', 'framer', 'webflow', 'sketch', 'invision', 'zeplin',
-  'midjourney', 'dall-e', 'stable diffusion', 'firefly', 'ai image generator',
-  'text to image', 'ai art generator', 'image generation',
-  'designer tool', 'design workflow',
-  'landing page builder', 'design ai', 'ai for design',
+const DESIGN_AI_ACTIONS = [
+  // Launches
+  'launch', 'launches', 'released', 'releases', 'announces', 'announced',
+  'unveiled', 'unveils', 'ships', 'debuts', 'drops', 'just dropped',
+  'rolls out', 'now available', 'just launched', 'introduces', 'introduced',
+  // Updates
+  'adds', 'added', 'new feature', 'new model', 'new version', 'update',
+  'updated', 'improves', 'expands', 'beta', 'ai-powered', 'powered by ai',
+  // General AI + design
+  'generate', 'generated', 'generative', 'ai-generated',
 ];
 
-// Reddit posts are conversational — need slightly looser matching
-const REDDIT_RELEVANCE_KEYWORDS = [
-  'ai design', 'ai designer', 'ai tool', 'ai replace', 'ai replacing',
-  'designers cooked', 'designer cooked', 'figma', 'midjourney', 'dall-e',
-  'stable diffusion', 'firefly', 'generative ai', 'ai art', 'ai image',
-  'ux design', 'ui design', 'graphic design', 'design job', 'design layoff',
-  'designer job', 'lost my job', 'replaced by ai', 'ai took my job',
-  'vibe design', 'google stitch', 'framer ai', 'canva ai',
+const LAYOFF_WORDS = [
+  'layoff', 'laid off', 'lay off', 'job cut', 'job loss', 'redundan',
+  'let go', 'studio clos', 'shutter', 'shut down', 'downsiz',
+  'workforce reduc', 'position eliminat', 'retrench', 'restructur',
+  'fired', 'cut jobs', 'cutting jobs', 'headcount reduc',
+  'rif', 'reduction in force', 'position eliminated', 'tech layoff',
+  'mass layoff', 'layoffs hit',
 ];
 
-function isRelevant(article) {
-  const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
-  let keywords;
-  if (article.source === 'Product Hunt') keywords = PH_RELEVANCE_KEYWORDS;
-  else if (article.source?.startsWith('Reddit')) keywords = REDDIT_RELEVANCE_KEYWORDS;
-  else keywords = RELEVANCE_KEYWORDS;
-  return keywords.some(kw => text.includes(kw));
-}
+const DESIGN_CONTEXT = [
+  'designer', 'design team', 'design studio', 'design agency',
+  'creative team', 'creative studio', 'creative agency',
+  'ux', 'ui ', 'art director', 'creative director',
+  'illustrator', 'motion designer', 'graphic designer',
+  'product designer', 'web designer', 'brand designer',
+  // Broader creative roles
+  'animator', 'photographer', 'videographer', 'cinematographer',
+  'visual artist', 'concept artist', 'game artist', '3d artist',
+  'creative professional', 'creative worker', 'creative industry',
+  'creative job', 'creative role', 'creative position',
+];
 
-// ── Scoring ────────────────────────────────────────────────
+const REPLACEMENT_PHRASES = [
+  'replace designer', 'replacing designer', 'replaced by ai',
+  'ai replace', 'no longer need designer', 'designer obsolete',
+  'ai beats designer', 'designers are cooked', 'designers cooked',
+  'fired their designer', 'ditched their designer', 'ai took',
+  'end of designers', 'death of design', 'designers unemployed',
+  'designers out of work', 'ai instead of designer',
+  // Broader creative replacement
+  'replace illustrator', 'replace animator', 'replace artist',
+  'replace photographer', 'replace creative', 'replacing artists',
+  'replacing illustrators', 'replacing animators',
+  'ai replaces creative', 'ai replacing creative',
+  'no longer need artist', 'artists out of work',
+  'illustrators losing jobs', 'artists losing jobs',
+];
+
 function matchesAny(text, keywords) {
   return keywords.some(kw => text.includes(kw));
 }
 
+function isRelevant(article) {
+  const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+
+  // Always let through: explicit replacement phrases
+  if (matchesAny(text, REPLACEMENT_PHRASES)) return true;
+
+  // CAT 3: layoffs with design context
+  if (matchesAny(text, LAYOFF_WORDS) && matchesAny(text, DESIGN_CONTEXT)) return true;
+
+  // CAT 1 & 2: named tool + any action or AI word
+  if (matchesAny(text, DESIGN_AI_TOOLS) && matchesAny(text, DESIGN_AI_ACTIONS)) return true;
+
+  // Product Hunt: must be a named tool, not just "design" in passing
+  if (article.source === 'Product Hunt') {
+    return matchesAny(text, DESIGN_AI_TOOLS);
+  }
+
+  return false;
+}
+
+// ── Scoring ────────────────────────────────────────────────
 function scoreArticle(article) {
   const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
 
-  if (matchesAny(text, SIGNALS.replacement.phrases))
-    return { score: SIGNALS.replacement.score, category: 'replacement' };
+  // Explicit replacement — highest signal
+  if (matchesAny(text, REPLACEMENT_PHRASES))
+    return { score: 20, category: 'replacement' };
 
-  if (matchesAny(text, SIGNALS.layoffs.primary) && matchesAny(text, SIGNALS.layoffs.context))
-    return { score: SIGNALS.layoffs.score, category: 'layoffs' };
+  // Layoffs with design context
+  if (matchesAny(text, LAYOFF_WORDS) && matchesAny(text, DESIGN_CONTEXT))
+    return { score: 32, category: 'layoffs' };
 
-  if (matchesAny(text, SIGNALS.tool_major.tools) && matchesAny(text, SIGNALS.tool_major.actions))
-    return { score: SIGNALS.tool_major.score, category: 'tool_major' };
+  // Major named tool launch — tool + strong action
+  const strongActions = ['launch', 'launches', 'released', 'releases', 'announced',
+    'announces', 'unveiled', 'unveils', 'ships', 'debuts', 'drops', 'now available',
+    'just launched', 'just dropped', 'rolls out'];
+  if (matchesAny(text, DESIGN_AI_TOOLS) && matchesAny(text, strongActions))
+    return { score: 22, category: 'tool_major' };
 
-  if (matchesAny(text, SIGNALS.tool_minor.tools) && matchesAny(text, SIGNALS.tool_minor.actions))
-    return { score: SIGNALS.tool_minor.score, category: 'tool_minor' };
+  // Minor update or vibe-coding mention
+  if (matchesAny(text, DESIGN_AI_TOOLS) && matchesAny(text, DESIGN_AI_ACTIONS))
+    return { score: 12, category: 'tool_minor' };
 
-  if (article.source === 'Product Hunt') {
-    const hasAI = ['ai', 'artificial intelligence', 'generative', 'llm', 'gpt'].some(kw => text.includes(kw));
-    const hasDesign = ['figma', 'ui', 'ux', 'design tool', 'prototype', 'wireframe',
-                       'mockup', 'logo', 'font', 'icon', 'design system', 'canva',
-                       'framer', 'webflow', 'illustration', 'motion', 'graphic design'].some(kw => text.includes(kw));
-    if (hasAI && hasDesign) return { score: 10, category: 'tool_minor' };
-  }
+  // Product Hunt — named tool present, assume launch
+  if (article.source === 'Product Hunt' && matchesAny(text, DESIGN_AI_TOOLS))
+    return { score: 10, category: 'tool_minor' };
 
   return { score: 0, category: null };
 }
