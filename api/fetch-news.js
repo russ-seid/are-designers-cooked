@@ -123,11 +123,11 @@ function analyzeHeadlines(articles) {
 }
 
 async function kvSet(key, value) {
-  const url = `${process.env.UPSTASH_REDIS_REST_URL}/set/${key}`;
+  const url = `${process.env.KV_REST_API_URL}/set/${key}`;
   const res = await fetch(url, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+      Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(value),
