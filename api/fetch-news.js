@@ -1,26 +1,10 @@
-const GNEWS_KEY = '5c79a5bb0e1e709423f7835d3a7e6400';
-
 // ── Source definitions ─────────────────────────────────────
-
-const GNEWS_QUERIES = [
-  'AI design tool released',
-  'designer layoffs AI',
-  'AI replace designer',
-];
-
-const REDDIT_SEARCHES = [
-  { subreddit: 'artificial', query: 'designer AI tool' },
-  { subreddit: 'graphic_design', query: 'AI replace designer' },
-  { subreddit: 'web_design', query: 'AI design' },
-  { subreddit: 'userexperience', query: 'AI designer' },
-];
 
 const RSS_FEEDS = [
   { name: 'The Verge - AI', url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml' },
   { name: 'The Verge - Tech', url: 'https://www.theverge.com/rss/tech/index.xml' },
   { name: 'TechCrunch - AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/' },
   { name: 'Creative Bloq', url: 'https://www.creativebloq.com/feeds/all' },
-  { name: 'Design Milk', url: 'https://design-milk.com/feed/' },
 ];
 
 // ── Scoring signals ────────────────────────────────────────
@@ -100,40 +84,6 @@ const SUMMARIES = {
 };
 
 // ── Fetchers ───────────────────────────────────────────────
-
-async function fetchGNews(query) {
-  const params = new URLSearchParams({
-    q: query, lang: 'en', max: '10', sortby: 'publishedAt', token: GNEWS_KEY,
-  });
-  const r = await fetch('https://gnews.io/api/v4/search?' + params);
-  const data = await r.json();
-  return (data.articles || []).map(a => ({
-    title:       a.title || '',
-    description: a.description || '',
-    url:         a.url,
-    source:      a.source?.name || 'GNews',
-    publishedAt: a.publishedAt,
-  }));
-}
-
-async function fetchReddit(subreddit, query) {
-  const params = new URLSearchParams({
-    q: query, sort: 'new', t: 'week', limit: '15', restrict_sr: '1',
-  });
-  const url = `https://www.reddit.com/r/${subreddit}/search.json?` + params;
-  const r = await fetch(url, {
-    headers: { 'User-Agent': 'are-designers-cooked/1.0' },
-  });
-  const data = await r.json();
-  const posts = data?.data?.children || [];
-  return posts.map(p => ({
-    title:       p.data.title || '',
-    description: p.data.selftext?.slice(0, 200) || '',
-    url:         'https://reddit.com' + p.data.permalink,
-    source:      'Reddit r/' + subreddit,
-    publishedAt: new Date(p.data.created_utc * 1000).toISOString(),
-  }));
-}
 
 // Simple XML tag extractor — no external parser needed
 function extractTags(xml, tag) {
@@ -359,8 +309,7 @@ export default async function handler(req, res) {
     const from = new Date(now.getTime() - 72 * 60 * 60 * 1000);
 
     // Run all sources in parallel
-    const [gnewsResults, rssResults, phResult] = await Promise.all([
-      Promise.allSettled(GNEWS_QUERIES.map(q => fetchGNews(q))),
+    const [rssResults, phResult] = await Promise.all([
       Promise.allSettled(RSS_FEEDS.map(f => fetchRSS(f))),
       fetchProductHunt().then(r => [{ status: 'fulfilled', value: r }]).catch(e => [{ status: 'rejected', reason: e }]),
     ]);
@@ -391,7 +340,6 @@ export default async function handler(req, res) {
       console.log(`[fetch-news] ${label}: +${added} articles (skipped ${skippedDate} too old, ${skippedIrrelevant} irrelevant, ${skippedDupe} dupes, ${failed} failed)`);
     };
 
-    addArticles(gnewsResults, 'GNews');
     addArticles(rssResults, 'RSS');
     addArticles(phResult, 'ProductHunt');
 
