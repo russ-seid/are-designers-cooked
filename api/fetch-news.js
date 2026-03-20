@@ -70,15 +70,6 @@ const SIGNALS = {
               'death of design', 'designers unemployed', 'vibe design'],
     score: 18,
   },
-  // Broad catch-all: any AI + design/creative context
-  ai_design_general: {
-    ai: ['ai', 'artificial intelligence', 'generative', 'machine learning', 'llm'],
-    design: ['design', 'designer', 'creative', 'artist', 'illustrat', 'visual',
-             'graphic', 'ux', 'ui', 'brand', 'typography', 'motion', 'prototype',
-             'wireframe', 'mockup', 'layout', 'color', 'font', 'logo', 'figma',
-             'photoshop', 'illustrator', 'webflow', 'framer', 'canva'],
-    score: 8,
-  },
 };
 
 const SUMMARIES = {
@@ -184,40 +175,82 @@ async function fetchRSS(feed) {
   return articles;
 }
 
-// Keywords that must appear in title or description for article to be considered
+async function fetchProductHunt() {
+  const tokenRes = await fetch('https://api.producthunt.com/v2/oauth/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      client_id:     process.env.PRODUCT_HUNT_API_KEY,
+      client_secret: process.env.PRODUCT_HUNT_API_SECRET,
+      grant_type:    'client_credentials',
+    }),
+  });
+  const tokenData = await tokenRes.json();
+  const token = tokenData.access_token;
+  if (!token) throw new Error('Product Hunt auth failed: ' + JSON.stringify(tokenData));
+
+  const query = `{
+    posts(first: 30, order: NEWEST) {
+      edges {
+        node {
+          name
+          tagline
+          url
+          createdAt
+        }
+      }
+    }
+  }`;
+
+  const r = await fetch('https://api.producthunt.com/v2/api/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ query }),
+  });
+  const data = await r.json();
+  const posts = data?.data?.posts?.edges || [];
+
+  return posts.map(({ node }) => ({
+    title:       node.name + ' — ' + node.tagline,
+    description: node.tagline,
+    url:         node.url,
+    source:      'Product Hunt',
+    publishedAt: node.createdAt,
+  }));
+}
+
+// Keywords — ALL must be specifically about digital/visual design
+// Deliberately excludes generic terms like 'brand', 'visual', 'layout'
+// that appear in non-design articles
 const RELEVANCE_KEYWORDS = [
-  // Core roles
-  'designer', 'ux designer', 'ui designer', 'graphic designer', 'art director',
-  'creative director', 'visual designer', 'product designer', 'web designer',
-  'motion designer', 'brand designer', 'illustrator', 'animator',
+  // Specific roles
+  'ux designer', 'ui designer', 'graphic designer', 'product designer',
+  'web designer', 'motion designer', 'interaction designer', 'visual designer',
+  'art director', 'creative director', 'brand designer',
 
-  // Design disciplines
-  'design', 'ux', 'ui ', 'user experience', 'user interface', 'interaction design',
-  'visual design', 'graphic design', 'brand design', 'motion design', 'web design',
-  'product design', 'design system', 'design token', 'typography', 'layout',
-  'wireframe', 'prototype', 'mockup', 'design thinking', 'human-centered',
+  // Specific disciplines
+  'user experience', 'user interface', 'ux design', 'ui design',
+  'graphic design', 'motion design', 'web design', 'product design',
+  'interaction design', 'design system', 'design tool', 'design software',
+  'wireframe', 'prototype', 'design workflow',
 
-  // Tools
-  'figma', 'adobe', 'sketch', 'invision', 'framer', 'webflow', 'canva',
-  'illustrator', 'photoshop', 'after effects', 'premiere', 'indesign',
-  'protopie', 'principle', 'zeplin', 'abstract', 'spline',
+  // Specific tools (named tools only — not generic 'design' or 'ai')
+  'figma', 'sketch', 'framer', 'webflow', 'canva', 'invision', 'zeplin',
+  'illustrator', 'photoshop', 'indesign', 'after effects', 'protopie',
+  'spline', 'principle', 'abstract',
 
-  // AI design tools
-  'midjourney', 'dall-e', 'stable diffusion', 'firefly', 'runway',
-  'leonardo', 'ideogram', 'recraft', 'pika', 'sora', 'lovart',
-  'google stitch', 'stitch', 'vibe design', 'microsoft designer',
-  'image generation', 'text to image', 'ai image', 'ai art',
-  'generative ai', 'creative ai', 'ai tool', 'ai design',
+  // Specific AI design tools
+  'midjourney', 'dall-e', 'stable diffusion', 'firefly', 'adobe firefly',
+  'runway ml', 'leonardo ai', 'ideogram', 'recraft', 'pika labs', 'lovart',
+  'google stitch', 'microsoft designer', 'vibe design',
 
-  // Industry terms
-  'branding', 'rebranding', 'logo', 'identity', 'color palette', 'font',
-  'typeface', 'kerning', 'spacing', 'grid', 'accessibility', 'a11y',
-  'usability', 'design agency', 'design studio', 'creative agency',
-  'design portfolio', 'design trend', 'design industry',
-
-  // Layoff / job context
-  'creative job', 'design job', 'designer job', 'design layoff',
-  'creative layoff', 'design workforce', 'freelance designer',
+  // Specific signals
+  'designers are cooked', 'designer layoff', 'design layoff',
+  'ai replace designer', 'ai replacing designer',
+  'designers losing jobs', 'design jobs',
 ];
 
 function isRelevant(article) {
@@ -243,10 +276,6 @@ function scoreArticle(article) {
 
   if (matchesAny(text, SIGNALS.tool_minor.tools) && matchesAny(text, SIGNALS.tool_minor.actions))
     return { score: SIGNALS.tool_minor.score, category: 'tool_minor' };
-
-  // Broad catch-all: AI + design context together
-  if (matchesAny(text, SIGNALS.ai_design_general.ai) && matchesAny(text, SIGNALS.ai_design_general.design))
-    return { score: SIGNALS.ai_design_general.score, category: 'ai_design_general' };
 
   return { score: 0, category: null };
 }
@@ -312,11 +341,10 @@ export default async function handler(req, res) {
     const from = new Date(now.getTime() - 72 * 60 * 60 * 1000);
 
     // Run all sources in parallel
-    const [gnewsResults, rssResults] = await Promise.all([
-      // GNews — 3 queries in parallel
+    const [gnewsResults, rssResults, phResult] = await Promise.all([
       Promise.allSettled(GNEWS_QUERIES.map(q => fetchGNews(q))),
-      // RSS feeds in parallel
       Promise.allSettled(RSS_FEEDS.map(f => fetchRSS(f))),
+      fetchProductHunt().then(r => [{ status: 'fulfilled', value: r }]).catch(e => [{ status: 'rejected', reason: e }]),
     ]);
 
     // Collect all articles
@@ -347,6 +375,7 @@ export default async function handler(req, res) {
 
     addArticles(gnewsResults, 'GNews');
     addArticles(rssResults, 'RSS');
+    addArticles(phResult, 'ProductHunt');
 
     console.log(`[fetch-news] Total: ${allArticles.length} articles in window`);
     // Log first 5 titles to see what we're working with
