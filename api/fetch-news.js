@@ -17,6 +17,7 @@ const REDDIT_SEARCHES = [
 
 const RSS_FEEDS = [
   { name: 'The Verge - AI', url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml' },
+  { name: 'The Verge - Tech', url: 'https://www.theverge.com/rss/tech/index.xml' },
   { name: 'TechCrunch - AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/' },
   { name: 'Creative Bloq', url: 'https://www.creativebloq.com/feeds/all' },
   { name: 'Design Milk', url: 'https://design-milk.com/feed/' },
@@ -25,30 +26,36 @@ const RSS_FEEDS = [
 // ── Scoring signals ────────────────────────────────────────
 const SIGNALS = {
   tool_major: {
-    tools: ['figma', 'adobe firefly', 'adobe', 'canva', 'midjourney', 'dall-e', 'dall·e',
+    tools: ['figma', 'adobe firefly', 'firefly', 'adobe', 'canva', 'midjourney', 'dall-e', 'dall·e',
             'stable diffusion', 'framer', 'galileo', 'uizard', 'leonardo', 'runway',
-            'microsoft designer', 'google stitch', 'google design', 'sketch', 'invision',
-            'protopie', 'spline', 'pika', 'sora', 'ideogram', 'recraft', 'lovart',
-            'design ai', 'ai designer'],
+            'microsoft designer', 'google stitch', 'stitch', 'vibe design', 'google design',
+            'sketch', 'invision', 'protopie', 'spline', 'pika', 'sora', 'ideogram',
+            'recraft', 'lovart', 'design ai', 'ai designer', 'nvidia', 'dlss'],
     actions: ['launch', 'releases', 'released', 'introduce', 'announce', 'unveil',
               'rolls out', 'roll out', 'ships', 'debuts', 'drops', 'just dropped',
-              'launched', 'introduced', 'announced'],
+              'launched', 'introduced', 'announced', 'new model', 'new version',
+              'custom model', 'new tool', 'new feature', 'now available', 'just launched'],
     score: 22,
   },
   tool_minor: {
-    tools: ['figma', 'adobe', 'canva', 'midjourney', 'dall-e', 'framer', 'galileo',
+    tools: ['figma', 'adobe', 'firefly', 'canva', 'midjourney', 'dall-e', 'framer', 'galileo',
             'uizard', 'leonardo', 'runway', 'sketch', 'ai design', 'generative design',
-            'google stitch', 'design tool'],
+            'google stitch', 'design tool', 'creative tool', 'ai art', 'ai image',
+            'image generation', 'text to image', 'generative ai'],
     actions: ['update', 'adds', 'added', 'new feature', 'improves', 'expands',
-              'integrates', 'plugin', 'beta', 'ai-powered', 'powered by ai', 'updated'],
+              'integrates', 'plugin', 'beta', 'ai-powered', 'powered by ai', 'updated',
+              'tame ai', 'using ai', 'with ai', 'ai model', 'ai tool', 'can ai'],
     score: 12,
   },
   layoffs: {
     primary: ['layoff', 'laid off', 'lay off', 'job cut', 'redundan', 'let go',
               'studio clos', 'shutter', 'shut down', 'downsiz', 'workforce reduc',
-              'position eliminat', 'retrench', 'restructur', 'headcount'],
+              'position eliminat', 'retrench', 'restructur', 'headcount',
+              'job loss', 'firing', 'fired', 'cut jobs', 'cutting jobs'],
     context: ['design', 'designer', 'creative', 'ux', 'ui', 'agency', 'studio',
-              'art director', 'illustrator', 'motion', 'graphic'],
+              'art director', 'illustrator', 'motion', 'graphic', 'brand',
+              'visual', 'product designer', 'web designer', 'animator',
+              'creative director', 'design team', 'design department'],
     score: 32,
   },
   replacement: {
@@ -57,8 +64,20 @@ const SIGNALS = {
               'ai-generated design', 'designers are cooked', 'designer is cooked',
               'designers cooked', 'ai took', 'without designer', 'ai does the design',
               'fired their designer', 'replaced their designer', 'ditched their designer',
-              'designers are finished', 'end of designers', 'ai will replace designer'],
+              'designers are finished', 'end of designers', 'ai will replace designer',
+              'do we need designers', 'designers becoming obsolete', 'kill design jobs',
+              'no need for designers', 'designers out of work', 'ai killing design',
+              'death of design', 'designers unemployed', 'vibe design'],
     score: 18,
+  },
+  // Broad catch-all: any AI + design/creative context
+  ai_design_general: {
+    ai: ['ai', 'artificial intelligence', 'generative', 'machine learning', 'llm'],
+    design: ['design', 'designer', 'creative', 'artist', 'illustrat', 'visual',
+             'graphic', 'ux', 'ui', 'brand', 'typography', 'motion', 'prototype',
+             'wireframe', 'mockup', 'layout', 'color', 'font', 'logo', 'figma',
+             'photoshop', 'illustrator', 'webflow', 'framer', 'canva'],
+    score: 8,
   },
 };
 
@@ -167,11 +186,38 @@ async function fetchRSS(feed) {
 
 // Keywords that must appear in title or description for article to be considered
 const RELEVANCE_KEYWORDS = [
-  'design', 'designer', 'figma', 'adobe', 'canva', 'midjourney', 'dall-e',
-  'ai tool', 'generative ai', 'creative ai', 'ux', 'ui ', 'graphic',
-  'illustrat', 'motion design', 'brand', 'visual', 'artwork', 'creative tool',
-  'stable diffusion', 'image generation', 'text to image', 'ai image',
-  'google stitch', 'framer', 'runway', 'sora', 'layout', 'prototype',
+  // Core roles
+  'designer', 'ux designer', 'ui designer', 'graphic designer', 'art director',
+  'creative director', 'visual designer', 'product designer', 'web designer',
+  'motion designer', 'brand designer', 'illustrator', 'animator',
+
+  // Design disciplines
+  'design', 'ux', 'ui ', 'user experience', 'user interface', 'interaction design',
+  'visual design', 'graphic design', 'brand design', 'motion design', 'web design',
+  'product design', 'design system', 'design token', 'typography', 'layout',
+  'wireframe', 'prototype', 'mockup', 'design thinking', 'human-centered',
+
+  // Tools
+  'figma', 'adobe', 'sketch', 'invision', 'framer', 'webflow', 'canva',
+  'illustrator', 'photoshop', 'after effects', 'premiere', 'indesign',
+  'protopie', 'principle', 'zeplin', 'abstract', 'spline',
+
+  // AI design tools
+  'midjourney', 'dall-e', 'stable diffusion', 'firefly', 'runway',
+  'leonardo', 'ideogram', 'recraft', 'pika', 'sora', 'lovart',
+  'google stitch', 'stitch', 'vibe design', 'microsoft designer',
+  'image generation', 'text to image', 'ai image', 'ai art',
+  'generative ai', 'creative ai', 'ai tool', 'ai design',
+
+  // Industry terms
+  'branding', 'rebranding', 'logo', 'identity', 'color palette', 'font',
+  'typeface', 'kerning', 'spacing', 'grid', 'accessibility', 'a11y',
+  'usability', 'design agency', 'design studio', 'creative agency',
+  'design portfolio', 'design trend', 'design industry',
+
+  // Layoff / job context
+  'creative job', 'design job', 'designer job', 'design layoff',
+  'creative layoff', 'design workforce', 'freelance designer',
 ];
 
 function isRelevant(article) {
@@ -197,6 +243,10 @@ function scoreArticle(article) {
 
   if (matchesAny(text, SIGNALS.tool_minor.tools) && matchesAny(text, SIGNALS.tool_minor.actions))
     return { score: SIGNALS.tool_minor.score, category: 'tool_minor' };
+
+  // Broad catch-all: AI + design context together
+  if (matchesAny(text, SIGNALS.ai_design_general.ai) && matchesAny(text, SIGNALS.ai_design_general.design))
+    return { score: SIGNALS.ai_design_general.score, category: 'ai_design_general' };
 
   return { score: 0, category: null };
 }
