@@ -89,10 +89,13 @@ const DESIGN_AI_ACTIONS = [
   'updated', 'improves', 'expands', 'beta', 'ai-powered', 'powered by ai',
   // General AI + design
   'generate', 'generated', 'generative', 'ai-generated',
-  // Loose but real — catches headlines like "Can Adobe tame AI?"
+  // Loose but real
   'new ', 'custom model', 'tame ai', 'using ai', 'with ai', 'can ai',
   'ai tool', 'ai model', 'ai feature', 'ai update', 'ai plugin',
   'ai integration', 'ai workflow', 'for designers', 'for creatives',
+  // Catches "says X is here", "could open", "is a no-code"
+  'says', 'is here', 'could ', 'is a ', 'will ', 'has ', 'here to',
+  'open ', 'change ', 'transform', 'disrupt', 'replace', 'kill ',
 ];
 
 const LAYOFF_WORDS = [
@@ -240,9 +243,12 @@ async function fetchRSS(feed) {
   const updatedDates = extractTags(xml, 'updated').map(stripCDATA);
   const articles = [];
   for (let i = 1; i < titles.length; i++) {
+    const title = titles[i] || '';
+    // Skip feed-level titles (no link, or title matches feed name, or too short)
+    if (!links[i] || title.length < 15) continue;
     const pub = pubDates[i] || updatedDates[i] || new Date().toISOString();
     articles.push({
-      title:       titles[i] || '',
+      title,
       description: descs[i] || '',
       url:         links[i] || '',
       source:      feed.name,
