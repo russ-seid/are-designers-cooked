@@ -585,7 +585,10 @@ async function startCheck() {
   startMsgCycle();
 
   try {
-    const res = await fetch('/api/results');
+    const [res] = await Promise.all([
+      fetch('/api/results'),
+      new Promise(r => setTimeout(r, 3000)), // minimum 3s loading
+    ]);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Server error ' + res.status);
