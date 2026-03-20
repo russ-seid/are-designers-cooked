@@ -57,9 +57,6 @@ body {
   margin-bottom: 2rem;
 }
 
-
-
-/* ── TIMEFRAME TOGGLE ── */
 .timeframe-toggle {
   display: flex;
   gap: 5px;
@@ -120,15 +117,9 @@ body {
 .error-toast.visible { display: block; }
 
 /* ── COOKING ANIMATION ── */
-.cook-wrap {
-  margin-bottom: 1.5rem;
-}
+.cook-wrap { margin-bottom: 1.5rem; }
 
-.pan-svg {
-  width: 200px;
-  height: 164px;
-  overflow: visible;
-}
+.pan-svg { width: 200px; height: 164px; overflow: visible; }
 
 .flame-l {
   transform-origin: 89px 158px;
@@ -142,7 +133,6 @@ body {
   transform-origin: 136px 158px;
   animation: flicker-r 0.7s ease-in-out infinite alternate;
 }
-
 @keyframes flicker-l {
   from { transform: scaleY(1) scaleX(1); opacity: 1; }
   to   { transform: scaleY(0.75) scaleX(0.9); opacity: 0.7; }
@@ -155,31 +145,27 @@ body {
   from { transform: scaleY(1) scaleX(1); opacity: 1; }
   to   { transform: scaleY(0.7) scaleX(0.85); opacity: 0.65; }
 }
-
 .egg-wobble {
   transform-origin: 100px 116px;
   animation: wobble 1.8s ease-in-out infinite;
 }
 @keyframes wobble {
   0%,100% { transform: scaleX(1) scaleY(1); }
-  30%      { transform: scaleX(1.04) scaleY(0.96); }
-  60%      { transform: scaleX(0.97) scaleY(1.03); }
+  30%     { transform: scaleX(1.04) scaleY(0.96); }
+  60%     { transform: scaleX(0.97) scaleY(1.03); }
 }
-
 .yolk-bounce {
   transform-origin: 100px 113px;
   animation: yolk 1.8s ease-in-out infinite;
 }
 @keyframes yolk {
   0%,100% { transform: translateY(0); }
-  30%      { transform: translateY(-2px); }
-  60%      { transform: translateY(1px); }
+  30%     { transform: translateY(-2px); }
+  60%     { transform: translateY(1px); }
 }
-
 .steam-1 { animation: steam-rise 2s ease-in-out infinite; }
 .steam-2 { animation: steam-rise 2s ease-in-out infinite 0.4s; }
 .steam-3 { animation: steam-rise 2s ease-in-out infinite 0.8s; }
-
 @keyframes steam-rise {
   0%   { opacity: 0;   transform: translateY(0); }
   20%  { opacity: 0.9; }
@@ -220,7 +206,6 @@ body {
   gap: 6px;
   margin-bottom: 1.25rem;
 }
-
 .heat-number {
   font-family: 'Anton', sans-serif;
   font-size: clamp(72px, 16vw, 130px);
@@ -228,7 +213,6 @@ body {
   letter-spacing: -0.02em;
   transition: color 0.05s;
 }
-
 .heat-pct {
   font-family: 'Anton', sans-serif;
   font-size: clamp(32px, 7vw, 58px);
@@ -239,17 +223,14 @@ body {
 }
 
 .heat-track-outer { width: 100%; position: relative; padding: 12px 14px 0; }
-
 .heat-track {
   width: 100%; height: 24px;
   border-radius: 12px;
-  background: linear-gradient(to right,
-    #15803D 0%, #65A30D 20%, #EAB308 45%, #F97316 70%, #FF4500 100%);
+  background: linear-gradient(to right, #15803D 0%, #65A30D 20%, #EAB308 45%, #F97316 70%, #FF4500 100%);
   border: 3px solid #111;
   position: relative;
   overflow: visible;
 }
-
 .heat-dimmer {
   position: absolute;
   top: -1px; right: -1px;
@@ -259,7 +240,6 @@ body {
   border-radius: 0 10px 10px 0;
   pointer-events: none;
 }
-
 .heat-marker {
   position: absolute;
   top: 50%;
@@ -272,7 +252,6 @@ body {
   z-index: 2;
   pointer-events: none;
 }
-
 .heat-labels {
   display: flex;
   justify-content: space-between;
@@ -283,7 +262,6 @@ body {
   text-transform: uppercase;
   color: #666;
 }
-
 .heat-tier {
   font-size: 15px;
   font-weight: 700;
@@ -304,7 +282,6 @@ body {
   box-shadow: 5px 5px 0 #111;
   margin-bottom: 1.5rem;
 }
-
 .result-summary {
   font-size: 17px;
   line-height: 1.65;
@@ -312,7 +289,6 @@ body {
   margin-bottom: 1.5rem;
   font-style: italic;
 }
-
 .evidence-header {
   font-size: 10px;
   font-weight: 700;
@@ -323,7 +299,6 @@ body {
   padding-bottom: 8px;
   border-bottom: 1.5px solid #eee;
 }
-
 .evidence-list { list-style: none; }
 .evidence-list li {
   padding: 10px 0;
@@ -333,7 +308,6 @@ body {
   gap: 10px;
 }
 .evidence-list li:last-child { border-bottom: none; padding-bottom: 0; }
-
 .ev-dot {
   width: 7px; height: 7px;
   border-radius: 50%;
@@ -353,23 +327,8 @@ body {
 }
 .ev-link:hover { border-bottom-color: #111; }
 .ev-text { display: block; font-size: 14px; color: #333; line-height: 1.45; }
-.ev-source {
-  display: inline-block;
-  font-size: 11px;
-  color: #bbb;
-  margin-top: 3px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-.ev-date {
-  display: inline-block;
-  font-size: 11px;
-  color: #bbb;
-  margin-top: 3px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  margin-left: 6px;
-}
+.ev-source { display: inline-block; font-size: 11px; color: #bbb; margin-top: 3px; font-weight: 600; letter-spacing: 0.04em; }
+.ev-date   { display: inline-block; font-size: 11px; color: #bbb; margin-top: 3px; font-weight: 600; letter-spacing: 0.04em; margin-left: 6px; }
 
 .stats-row {
   display: flex;
@@ -381,10 +340,13 @@ body {
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
-.stat-chip {
-  background: #f5f5f5;
-  border-radius: 3px;
-  padding: 5px 10px;
+.stat-chip { background: #f5f5f5; border-radius: 3px; padding: 5px 10px; }
+
+.freshness {
+  font-size: 11px;
+  color: #aaa;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
 }
 
 .btn-again {
@@ -402,7 +364,6 @@ body {
   transition: background 0.15s, color 0.15s;
 }
 .btn-again:hover { background: #111; color: #FFE033; }
-
 .checked-on { margin-top: 1rem; font-size: 12px; color: #666; }
 </style>
 </head>
@@ -410,20 +371,11 @@ body {
 
 <!-- IDLE -->
 <div class="screen active" id="screen-idle">
-
   <h1 class="headline">Are<br>Designers<br>Cooked<br>Today?</h1>
   <p class="subtitle">
     Every day, somewhere on the internet, someone declares designers
-    are cooked.
-    Let's check the news and find out if today is that day.
+    are cooked. Let's check the news and find out if today is that day.
   </p>
-
-  <div class="timeframe-toggle">
-    <button class="tf-btn active" data-tf="today"     onclick="setTimeframe(this)">Today</button>
-    <button class="tf-btn" data-tf="yesterday" onclick="setTimeframe(this)">Yesterday</button>
-    <button class="tf-btn" data-tf="week"      onclick="setTimeframe(this)">This week</button>
-  </div>
-
   <button class="btn-main" id="btn-check" onclick="startCheck()">Check today's verdict →</button>
   <div class="error-toast" id="error-toast"></div>
   <p class="fine-print">For entertainment only</p>
@@ -433,24 +385,17 @@ body {
 <div class="screen" id="screen-loading">
   <div class="cook-wrap">
     <svg class="pan-svg" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
-      <!-- Flames -->
       <g class="flames">
         <path class="flame flame-l" d="M85 158 Q78 140 88 128 Q84 142 95 138 Q86 150 93 158Z" fill="#FFE033" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
         <path class="flame flame-c" d="M108 155 Q98 130 112 112 Q106 134 122 126 Q110 144 118 155Z" fill="#FFE033" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
         <path class="flame flame-r" d="M132 158 Q128 140 138 128 Q132 142 144 136 Q136 150 140 158Z" fill="#FFE033" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
       </g>
-      <!-- Pan body -->
       <ellipse cx="110" cy="120" rx="68" ry="18" fill="#FFE033" stroke="#000" stroke-width="4"/>
       <path d="M42 120 Q42 158 110 158 Q178 158 178 120" fill="#FFE033" stroke="#000" stroke-width="4" stroke-linecap="round"/>
-      <!-- Pan handle -->
       <rect x="170" y="112" width="46" height="14" rx="7" fill="#111" stroke="#000" stroke-width="3"/>
-      <!-- Egg white -->
       <ellipse class="egg-wobble" cx="100" cy="116" rx="32" ry="12" fill="#fff" stroke="#000" stroke-width="3"/>
-      <!-- Yolk -->
       <ellipse class="yolk-bounce" cx="100" cy="113" rx="13" ry="11" fill="#FFE033" stroke="#000" stroke-width="3"/>
-      <!-- Shine on yolk -->
       <ellipse cx="95" cy="109" rx="4" ry="3" fill="#fff" opacity="0.5"/>
-      <!-- Steam lines -->
       <g class="steam">
         <path class="steam-1" d="M80 95 Q76 85 80 75 Q84 65 80 55" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
         <path class="steam-2" d="M100 90 Q96 78 100 66 Q104 54 100 42" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
@@ -458,13 +403,13 @@ body {
       </g>
     </svg>
   </div>
-  <h2 class="load-title" id="load-title">Fetching the news...</h2>
+  <h2 class="load-title" id="load-title">Getting the verdict...</h2>
   <p class="load-msg" id="load-msg">Checking if Figma dropped something spicy...</p>
 </div>
 
 <!-- RESULT -->
 <div class="screen" id="screen-result">
-  <p class="verdict-meta" id="verdict-meta">Cook level — today</p>
+  <p class="verdict-meta">Cook level — today</p>
 
   <div class="heat-meter-wrap">
     <div class="heat-score-row">
@@ -487,35 +432,21 @@ body {
 
   <div class="result-card">
     <div class="stats-row" id="stats-row"></div>
+    <p class="freshness" id="freshness"></p>
     <p class="result-summary" id="result-summary"></p>
-    <p class="evidence-header" id="evidence-header">Headlines found</p>
+    <p class="evidence-header" id="evidence-header">Headlines that moved the needle</p>
     <ul class="evidence-list" id="evidence-list"></ul>
   </div>
 
   <button class="btn-again" onclick="resetToIdle()">← Check again</button>
-  <p class="checked-on" id="checked-on"></p>
 </div>
 
 <script>
-const GNEWS_KEY = '5c79a5bb0e1e709423f7835d3a7e6400';
-
-const GNEWS_QUERIES = [
-  'AI design tool released',
-  'designer layoffs AI',
-  'AI replace designer',
-];
-
-const LOAD_MSGS_NEWS = [
+const LOAD_MSGS = [
   'Checking if Figma dropped something spicy...',
-  'Searching for designer carnage...',
-  'Asking the news if robots took any jobs...',
-  'Hunting for AI design announcements...',
-];
-
-const LOAD_MSGS_AI = [
-  'Feeding headlines to Claude...',
+  'Scanning for designer carnage...',
   'Calculating existential dread levels...',
-  'Scoring the cook level...',
+  'Consulting the AI overlords...',
   'Almost there — crunching the verdict...',
 ];
 
@@ -529,43 +460,9 @@ const TIERS = [
   { max: 100, label: 'RIP designers. It was fun.' },
 ];
 
-let currentTf = 'today';
 let loadTimer = null;
 let msgIdx = 0;
 let countTimer = null;
-
-function setTimeframe(btn) {
-  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentTf = btn.dataset.tf;
-  const labels  = { today: 'Today', yesterday: 'Yesterday', week: 'This week' };
-  const btnText = { today: "Check today's verdict →", yesterday: "Check yesterday →", week: "Check this week →" };
-  document.getElementById('btn-check').textContent = btnText[currentTf];
-}
-
-function getRange(tf) {
-  const now   = new Date();
-  const pad   = n => String(n).padStart(2, '0');
-  const iso   = d => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
-  const human = d => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-
-  // GNews needs from=start-of-day to=end-of-day (or now)
-  const startOfDay = d => iso(d) + 'T00:00:00Z';
-  const endOfDay   = d => iso(d) + 'T23:59:59Z';
-  const nowISO = now.toISOString();
-
-  if (tf === 'today') {
-    // Free GNews has 12h delay — look at last 36h to catch today's delayed articles
-    const s = new Date(now); s.setHours(now.getHours() - 36);
-    return { from: s.toISOString(), to: now.toISOString(), label: human(now) };
-  }
-  if (tf === 'yesterday') {
-    const y = new Date(now); y.setDate(now.getDate() - 1);
-    return { from: startOfDay(y), to: endOfDay(y), label: human(y) };
-  }
-  const s = new Date(now); s.setDate(now.getDate() - 6);
-  return { from: startOfDay(s), to: nowISO, label: human(s) + ' – ' + human(now) };
-}
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -580,14 +477,14 @@ function setLoadMsg(msg) {
   setTimeout(() => { el.textContent = msg; el.style.opacity = 1; }, 350);
 }
 
-function startMsgCycle(msgs) {
+function startMsgCycle() {
   clearInterval(loadTimer);
   msgIdx = 0;
-  document.getElementById('load-msg').textContent = msgs[0];
+  document.getElementById('load-msg').textContent = LOAD_MSGS[0];
   document.getElementById('load-msg').style.opacity = 1;
   loadTimer = setInterval(() => {
-    msgIdx = (msgIdx + 1) % msgs.length;
-    setLoadMsg(msgs[msgIdx]);
+    msgIdx = (msgIdx + 1) % LOAD_MSGS.length;
+    setLoadMsg(LOAD_MSGS[msgIdx]);
   }, 2200);
 }
 
@@ -607,7 +504,7 @@ function showError(html) {
   t.classList.add('visible');
 }
 
-function lerp(a, b, t) { return Math.round(a + (b-a)*t); }
+function lerp(a, b, t) { return Math.round(a + (b - a) * t); }
 
 function scoreColor(s) {
   s = Math.max(0, Math.min(100, s));
@@ -667,286 +564,81 @@ function animateScore(target) {
   }));
 }
 
-async function fetchGNews(query, from, to) {
-  const params = new URLSearchParams({ q: query });
-  const res = await fetch('/api/gnews?' + params);
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const err = new Error(body.errors?.[0] || 'GNews error ' + res.status);
-    err.status = res.status;
-    throw err;
-  }
-  // Filter articles by date on our side since free plan has 12h delay
-  const articles = body.articles || [];
-  const fromMs = new Date(from).getTime();
-  const toMs   = new Date(to).getTime();
-  return articles.filter(a => {
-    const t = new Date(a.publishedAt).getTime();
-    return t >= fromMs && t <= toMs;
-  });
-}
-
-function dedupeArticles(articles) {
-  const seen = new Set();
-  return articles.filter(a => {
-    if (seen.has(a.url)) return false;
-    seen.add(a.url);
-    return true;
-  });
-}
-
 function formatDate(isoStr) {
   try {
     return new Date(isoStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   } catch { return ''; }
 }
 
-// ── Keyword scoring algorithm (no API needed) ─────────────
-const SIGNALS = {
-  // Major tool launches — named tool + launch action
-  tool_major: {
-    tools: ['figma', 'adobe firefly', 'adobe', 'canva', 'midjourney', 'dall-e', 'dall·e',
-            'stable diffusion', 'framer', 'galileo', 'uizard', 'leonardo', 'runway',
-            'microsoft designer', 'google design', 'sketch', 'invision', 'protopie',
-            'spline', 'pika', 'sora', 'ideogram', 'recraft'],
-    actions: ['launch', 'releases', 'released', 'introduce', 'announce', 'unveil',
-              'rolls out', 'roll out', 'ships', 'debuts', 'drops', 'just dropped'],
-    score: 22,
-  },
-  // Minor tool updates — tool + softer action
-  tool_minor: {
-    tools: ['figma', 'adobe', 'canva', 'midjourney', 'dall-e', 'framer', 'galileo',
-            'uizard', 'leonardo', 'runway', 'sketch', 'ai design', 'generative design'],
-    actions: ['update', 'adds', 'added', 'new feature', 'improves', 'expands',
-              'integrates', 'plugin', 'beta', 'ai-powered', 'powered by ai'],
-    score: 12,
-  },
-  // Designer layoffs
-  layoffs: {
-    primary: ['layoff', 'laid off', 'lay off', 'job cut', 'redundan', 'let go',
-              'studio clos', 'shutter', 'shut down', 'downsiz', 'workforce reduc',
-              'position eliminat', 'retrench', 'restructur', 'headcount'],
-    context: ['design', 'designer', 'creative', 'ux', 'ui', 'agency', 'studio',
-              'art director', 'illustrator', 'motion'],
-    score: 32,
-  },
-  // AI directly replacing / beating designers
-  replacement: {
-    phrases: ['replac', 'ai instead of designer', 'no longer need designer',
-              'designer obsolete', 'ai beats designer', 'ai beat designer',
-              'ai-generated design', 'ai over designer', 'ai took', 'without designer',
-              'ai does the design', 'ai doing design', 'fired their designer',
-              'replaced their designer', 'ditched their designer'],
-    score: 18,
-  },
-};
-
-const SUMMARIES = {
-  safe: [
-    "The robots clocked out early today. Designers across the world can unclench — no major AI announcements, no layoffs, no existential crises. Enjoy it while it lasts.",
-    "Surprisingly quiet on the AI front. Either the tech overlords are on vacation, or they're just charging up for something bigger. Either way, designers live to kern another day.",
-    "Nothing to report. The design industry is intact, Figma hasn't dropped a bombshell, and no one declared designers obsolete today. A miracle, frankly.",
-  ],
-  warm: [
-    "A few ripples in the pond, but nothing catastrophic. Some AI news is floating around but it's not the apocalypse — just a gentle reminder that the robots are still watching.",
-    "Mild heat today. There's movement in the AI design space but nothing that should make you update your LinkedIn just yet. Maybe check back tomorrow.",
-    "The thermometer is rising slightly. A few headlines worth noting, but designers are still very much employed and needed. For now.",
-  ],
-  hot: [
-    "It's getting warm in here. Some significant AI developments in the design space today — not a full meltdown, but enough to make any designer refresh their portfolio.",
-    "Okay, now we're cooking. Today brought some real news that has the design community sweating. Not a crisis, but definitely a 'maybe learn some prompting' kind of day.",
-    "The heat is real. Enough happened today that even the optimists are quietly opening their freelance profiles. Just in case.",
-  ],
-  cooked: [
-    "Designers are very cooked today. Between the layoffs and the AI announcements, it's been a rough one. The good news: someone still has to tell the AI what to make. Probably.",
-    "Well. It's been a day. Multiple alarm bells are ringing in the design world — new tools, job cuts, and the usual 'AI will replace you' discourse hitting new highs. Carry on, I guess.",
-    "Today was not kind to the design industry. If you're a designer reading this, maybe go touch some grass and come back when the news cycle calms down. Or don't. It might not.",
-  ],
-  apocalypse: [
-    "RIP designers. Today was a full-on disaster — major layoffs, significant AI tool launches, and enough 'AI replaces designers' stories to fill a LinkedIn feed. It was fun while it lasted.",
-    "The score speaks for itself. Today delivered a near-perfect storm of bad design industry news. We had a good run, folks.",
-  ],
-};
-
-function getText(article) {
-  return ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
-}
-
-function matchesAny(text, keywords) {
-  return keywords.some(kw => text.includes(kw));
-}
-
-function scoreArticle(article) {
-  const text = getText(article);
-  let score = 0;
-  let category = null;
-
-  // Check replacement first (most specific)
-  if (matchesAny(text, SIGNALS.replacement.phrases)) {
-    score = SIGNALS.replacement.score;
-    category = 'replacement';
-    return { score, category };
-  }
-
-  // Layoffs: needs a primary layoff word + design context word
-  if (matchesAny(text, SIGNALS.layoffs.primary) && matchesAny(text, SIGNALS.layoffs.context)) {
-    score = SIGNALS.layoffs.score;
-    category = 'layoffs';
-    return { score, category };
-  }
-
-  // Major tool launch: named tool + strong action word
-  if (matchesAny(text, SIGNALS.tool_major.tools) && matchesAny(text, SIGNALS.tool_major.actions)) {
-    score = SIGNALS.tool_major.score;
-    category = 'tool_major';
-    return { score, category };
-  }
-
-  // Minor tool update: named tool + softer action
-  if (matchesAny(text, SIGNALS.tool_minor.tools) && matchesAny(text, SIGNALS.tool_minor.actions)) {
-    score = SIGNALS.tool_minor.score;
-    category = 'tool_minor';
-    return { score, category };
-  }
-
-  return { score: 0, category: null };
-}
-
-function analyzeHeadlines(articles) {
-  const categoryCounts = {};
-  const relevant = [];
-  let totalScore = 0;
-
-  articles.forEach((article, idx) => {
-    const { score, category } = scoreArticle(article);
-    if (score === 0) return;
-
-    // Diminishing returns: 2nd+ article in same category scores 50%
-    const count = categoryCounts[category] || 0;
-    const effectiveScore = count >= 2 ? score * 0.3 : count === 1 ? score * 0.6 : score;
-    categoryCounts[category] = count + 1;
-
-    totalScore += effectiveScore;
-    relevant.push(idx);
-  });
-
-  totalScore = Math.min(100, Math.round(totalScore));
-
-  // Pick dominant category for summary flavoring
-  const dominant = Object.entries(categoryCounts)
-    .sort((a, b) => b[1] - a[1])[0]?.[0] || null;
-
-  // Pick summary band
-  let band;
-  if (totalScore <= 15)      band = 'safe';
-  else if (totalScore <= 40) band = 'warm';
-  else if (totalScore <= 65) band = 'hot';
-  else if (totalScore <= 85) band = 'cooked';
-  else                       band = 'apocalypse';
-
-  const pool = SUMMARIES[band];
-  const summary = pool[Math.floor(Math.random() * pool.length)];
-
-  return { score: totalScore, summary, relevant, dominant };
-}
-
-async function analyzeWithJS(articles, range) {
-  // Small artificial delay so the loading animation doesn't flash too fast
-  await new Promise(r => setTimeout(r, 600));
-  return analyzeHeadlines(articles);
+function timeAgo(isoStr) {
+  const diff = Date.now() - new Date(isoStr).getTime();
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  if (h >= 24) return Math.floor(h/24) + 'd ago';
+  if (h > 0)   return h + 'h ago';
+  return m + 'm ago';
 }
 
 async function startCheck() {
   document.getElementById('error-toast').classList.remove('visible');
   showScreen('screen-loading');
-  document.getElementById('load-title').textContent = 'Fetching the news...';
-  startMsgCycle(LOAD_MSGS_NEWS);
-
-  const range = getRange(currentTf);
+  startMsgCycle();
 
   try {
-    const results = await Promise.allSettled(
-      GNEWS_QUERIES.map(q => fetchGNews(q, range.from, range.to))
-    );
-
-    let allArticles = [];
-    let gnewsError = null;
-    for (const r of results) {
-      if (r.status === 'fulfilled') {
-        allArticles.push(...r.value);
-      } else {
-        const err = r.reason;
-        console.error('[GNews] query failed:', err);
-        if (err.status === 401 || err.status === 403) throw { type: 'gnews_auth' };
-        if (err.status === 429) throw { type: 'gnews_rate' };
-        gnewsError = err; // save for reporting but keep going
-      }
+    const res = await fetch('/api/results');
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Server error ' + res.status);
     }
-
-    // If every query failed, surface the error
-    if (allArticles.length === 0 && gnewsError) {
-      throw { type: 'gnews_other', message: gnewsError.message };
-    }
-
-    allArticles = dedupeArticles(allArticles);
-
-    document.getElementById('load-title').textContent = 'Analyzing headlines...';
-    startMsgCycle(LOAD_MSGS_AI);
-
-    const analysis = await analyzeWithJS(allArticles, range);
-
+    const result = await res.json();
     stopMsgs();
-    renderResult(analysis, allArticles, range);
-
+    renderResult(result);
   } catch (err) {
     console.error(err);
-    if (err?.type === 'gnews_auth') {
-      showError('⚠️ GNews API key issue. Check the key is active at <a href="https://gnews.io" target="_blank" style="color:#FF4500">gnews.io</a>.');
-    } else if (err?.type === 'gnews_rate') {
-      showError('⚠️ GNews daily limit hit (100 req/day on free tier). Try again tomorrow.');
-    } else if (err?.type === 'gnews_other') {
-      showError('⚠️ GNews error: ' + err.message + '<br><span style="font-size:13px;font-weight:400;">Check the browser console (F12) for details.</span>');
-    } else {
-      showError('⚠️ Something went wrong. Check your connection and try again.');
-    }
+    showError('⚠️ ' + (err.message || 'Something went wrong. Try again.'));
   }
 }
 
-function renderResult(analysis, allArticles, range) {
-  const score = Math.max(0, Math.min(100, Math.round(analysis.score || 0)));
-  const relevantIdxs = new Set((analysis.relevant || []).map(i => i - 1));
-  const relevantArticles = allArticles.filter((_, i) => relevantIdxs.has(i)).slice(0, 5);
+function renderResult(result) {
+  const score    = Math.max(0, Math.min(100, Math.round(result.score || 0)));
+  const articles = result.articles || [];
 
-  const tfLabels = { today: 'today', yesterday: 'yesterday', week: 'this week' };
-  document.getElementById('verdict-meta').textContent = 'Cook level — ' + (tfLabels[currentTf] || 'today');
-
+  // Stats
   const statsRow = document.getElementById('stats-row');
   statsRow.innerHTML = '';
-  [allArticles.length + ' headlines scanned', relevantArticles.length + ' relevant found'].forEach(c => {
+  [result.total + ' headlines scanned', articles.length + ' relevant found'].forEach(c => {
     const el = document.createElement('span');
     el.className = 'stat-chip';
     el.textContent = c;
     statsRow.appendChild(el);
   });
 
-  document.getElementById('result-summary').textContent = analysis.summary || '';
-  document.getElementById('evidence-header').textContent =
-    relevantArticles.length ? 'Headlines that moved the needle' : 'Headlines found';
+  // Freshness
+  if (result.fetchedAt) {
+    document.getElementById('freshness').textContent =
+      'News last refreshed ' + timeAgo(result.fetchedAt) + ' · updates twice daily';
+  }
+
+  document.getElementById('result-summary').textContent = result.summary || '';
+
+  // Evidence
+  const header = document.getElementById('evidence-header');
+  header.textContent = articles.length ? 'Headlines that moved the needle' : 'What we found';
 
   const list = document.getElementById('evidence-list');
   list.innerHTML = '';
 
-  if (!relevantArticles.length) {
+  if (!articles.length) {
     const li = document.createElement('li');
     const dot = document.createElement('span'); dot.className = 'ev-dot';
     const body = document.createElement('div'); body.className = 'ev-body';
     const t = document.createElement('span'); t.className = 'ev-text';
-    t.textContent = allArticles.length
+    t.textContent = result.total > 0
       ? 'No headlines were alarming enough to raise the cook level.'
       : 'No design/AI news found for this period.';
     body.appendChild(t); li.appendChild(dot); li.appendChild(body); list.appendChild(li);
   } else {
-    relevantArticles.forEach(item => {
+    articles.forEach(item => {
       const li   = document.createElement('li');
       const dot  = document.createElement('span'); dot.className = 'ev-dot';
       const body = document.createElement('div'); body.className = 'ev-body';
@@ -964,9 +656,9 @@ function renderResult(analysis, allArticles, range) {
       }
 
       const meta = document.createElement('div');
-      if (item.source?.name) {
+      if (item.source) {
         const src = document.createElement('span'); src.className = 'ev-source';
-        src.textContent = item.source.name;
+        src.textContent = item.source;
         meta.appendChild(src);
       }
       if (item.publishedAt) {
@@ -979,7 +671,6 @@ function renderResult(analysis, allArticles, range) {
     });
   }
 
-  document.getElementById('checked-on').textContent = 'Period checked: ' + range.label;
   showScreen('screen-result');
   setTimeout(() => animateScore(score), 120);
 }
