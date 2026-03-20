@@ -111,7 +111,7 @@ const PH_RELEVANCE_KEYWORDS = [
   'canva', 'framer', 'webflow', 'sketch', 'invision', 'zeplin',
   'midjourney', 'dall-e', 'stable diffusion', 'firefly', 'ai image generator',
   'text to image', 'ai art generator', 'image generation',
-  'for designers', 'designer tool', 'design workflow',
+  'designer tool', 'design workflow',
   'landing page builder', 'design ai', 'ai for design',
 ];
 
@@ -156,9 +156,9 @@ function scoreArticle(article) {
 
   if (article.source === 'Product Hunt') {
     const hasAI = ['ai', 'artificial intelligence', 'generative', 'llm', 'gpt'].some(kw => text.includes(kw));
-    const hasDesign = ['design', 'designer', 'figma', 'ui', 'ux', 'creative', 'graphic',
-                       'illustration', 'motion', 'prototype', 'wireframe', 'logo', 'font',
-                       'brand', 'visual', 'color', 'icon', 'template'].some(kw => text.includes(kw));
+    const hasDesign = ['figma', 'ui', 'ux', 'design tool', 'prototype', 'wireframe',
+                       'mockup', 'logo', 'font', 'icon', 'design system', 'canva',
+                       'framer', 'webflow', 'illustration', 'motion', 'graphic design'].some(kw => text.includes(kw));
     if (hasAI && hasDesign) return { score: 10, category: 'tool_minor' };
   }
 
@@ -329,6 +329,7 @@ export default async function handler(req, res) {
     addArticles(phResult,   'ProductHunt');
 
     console.log(`[results] Total: ${allArticles.length} for ${window.label}`);
+    allArticles.forEach((a, i) => console.log(`[results] Article ${i+1}: [${a.source}] ${a.title}`));
 
     const analysis = analyzeHeadlines(allArticles);
     const relevantArticles = allArticles
