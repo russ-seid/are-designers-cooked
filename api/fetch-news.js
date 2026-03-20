@@ -267,28 +267,32 @@ export default async function handler(req, res) {
     const seen = new Set();
     const allArticles = [];
 
-    const addArticles = (results) => {
+    const addArticles = (results, label) => {
+      let added = 0, skippedDate = 0, skippedDupe = 0, failed = 0;
       for (const r of results) {
         if (r.status !== 'fulfilled') {
-          console.warn('[fetch-news] Source failed:', r.reason?.message);
+          console.warn(`[fetch-news] ${label} source failed:`, r.reason?.message);
+          failed++;
           continue;
         }
         for (const article of r.value) {
-          if (!article.url || seen.has(article.url)) continue;
-          // Filter to time window
+          if (!article.url) continue;
+          if (seen.has(article.url)) { skippedDupe++; continue; }
           const t = new Date(article.publishedAt).getTime();
-          if (t < from.getTime()) continue;
+          if (t < from.getTime()) { skippedDate++; continue; }
           seen.add(article.url);
           allArticles.push(article);
+          added++;
         }
       }
+      console.log(`[fetch-news] ${label}: +${added} articles (skipped ${skippedDate} too old, ${skippedDupe} dupes, ${failed} failed sources)`);
     };
 
-    addArticles(gnewsResults);
-    addArticles(redditResults);
-    addArticles(rssResults);
+    addArticles(gnewsResults, 'GNews');
+    addArticles(redditResults, 'Reddit');
+    addArticles(rssResults, 'RSS');
 
-    console.log(`[fetch-news] Articles collected: ${allArticles.length} (from ${seen.size} unique sources)`);
+    console.log(`[fetch-news] Total: ${allArticles.length} articles in window`);
 
     const analysis = analyzeHeadlines(allArticles);
     const relevantArticles = allArticles
