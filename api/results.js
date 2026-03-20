@@ -104,12 +104,15 @@ const RELEVANCE_KEYWORDS = [
 ];
 
 const PH_RELEVANCE_KEYWORDS = [
-  'design', 'designer', 'figma', 'ui', 'ux', 'canva', 'framer', 'webflow',
-  'sketch', 'prototype', 'wireframe', 'mockup', 'icon', 'logo', 'font',
-  'typography', 'color', 'illustration', 'motion', 'animation', 'creative',
-  'midjourney', 'dall-e', 'firefly', 'ai art', 'ai image', 'text to image',
-  'generative', 'visual', 'graphic', 'brand', 'landing page', 'component',
-  'asset', 'template', 'style guide', 'design system',
+  'figma', 'ui design', 'ux design', 'graphic design', 'web design',
+  'design tool', 'design system', 'design asset', 'design template',
+  'ui kit', 'icon pack', 'font tool', 'typography tool', 'color tool',
+  'wireframe', 'prototype tool', 'mockup tool', 'logo maker',
+  'canva', 'framer', 'webflow', 'sketch', 'invision', 'zeplin',
+  'midjourney', 'dall-e', 'stable diffusion', 'firefly', 'ai image generator',
+  'text to image', 'ai art generator', 'image generation',
+  'for designers', 'designer tool', 'design workflow',
+  'landing page builder', 'design ai', 'ai for design',
 ];
 
 // Reddit posts are conversational — need slightly looser matching
@@ -263,36 +266,7 @@ async function fetchProductHunt() {
   }));
 }
 
-async function fetchReddit(dateParam) {
-  const subreddits = [
-    { sub: 'graphic_design',  query: 'AI designer tool' },
-    { sub: 'artificial',      query: 'design AI tool' },
-    { sub: 'userexperience',  query: 'AI designer' },
-    { sub: 'web_design',      query: 'AI design' },
-  ];
-
-  const results = await Promise.allSettled(
-    subreddits.map(async ({ sub, query }) => {
-      const url = `https://www.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(query)}&sort=new&t=month&limit=15&restrict_sr=1`;
-      const r = await fetch(url, {
-        headers: { 'User-Agent': 'are-designers-cooked/1.0 (hobby project)' },
-      });
-      if (!r.ok) throw new Error(`Reddit ${sub} ${r.status}`);
-      const data = await r.json();
-      return (data?.data?.children || []).map(p => ({
-        title:       p.data.title || '',
-        description: p.data.selftext?.slice(0, 200) || '',
-        url:         'https://reddit.com' + p.data.permalink,
-        source:      'Reddit r/' + sub,
-        publishedAt: new Date(p.data.created_utc * 1000).toISOString(),
-      }));
-    })
-  );
-
-  return results
-    .filter(r => r.status === 'fulfilled')
-    .flatMap(r => r.value);
-}
+// ── Date helpers ───────────────────────────────────────────
 function getDateWindow(dateParam) {
   // dateParam: 'YYYY-MM-DD' or null (defaults to today)
   const now = new Date();
@@ -324,13 +298,11 @@ export default async function handler(req, res) {
   const window = getDateWindow(dateParam);
 
   try {
-    const [rssResults, phResult, redditArticles] = await Promise.all([
+    const [rssResults, phResult] = await Promise.all([
       Promise.allSettled(RSS_FEEDS.map(f => fetchRSS(f))),
       fetchProductHunt()
         .then(r  => [{ status: 'fulfilled', value: r }])
         .catch(e => [{ status: 'rejected',  reason: e }]),
-      fetchReddit(dateParam)
-        .catch(() => []),
     ]);
 
     const seen = new Set();
@@ -355,9 +327,6 @@ export default async function handler(req, res) {
 
     addArticles(rssResults, 'RSS');
     addArticles(phResult,   'ProductHunt');
-
-    // Reddit returns flat array — wrap it to match allSettled format
-    addArticles([{ status: 'fulfilled', value: redditArticles }], 'Reddit');
 
     console.log(`[results] Total: ${allArticles.length} for ${window.label}`);
 
