@@ -338,7 +338,14 @@ export default async function handler(req, res) {
           if (!article.url || seen.has(article.url)) continue;
           const t = new Date(article.publishedAt).getTime();
           if (t < window.from.getTime() || t > window.to.getTime()) { skippedDate++; continue; }
-          if (!isRelevant(article)) { skippedIrrelevant++; continue; }
+          if (!isRelevant(article)) {
+            skippedIrrelevant++;
+            // Log borderline articles so we can tune the filter
+            const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+            const hasTool = DESIGN_AI_TOOLS.some(kw => text.includes(kw));
+            if (hasTool) console.log(`[results] NEAR-MISS [${label}]: ${article.title}`);
+            continue;
+          }
           seen.add(article.url);
           allArticles.push(article);
           added++;
