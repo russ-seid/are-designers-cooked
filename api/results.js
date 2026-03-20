@@ -152,7 +152,19 @@ function isRelevant(article) {
   // CAT 1 & 2: named tool + any action or AI word
   if (matchesAny(text, DESIGN_AI_TOOLS) && matchesAny(text, DESIGN_AI_ACTIONS)) return true;
 
-  // Product Hunt: must be a named tool, not just "design" in passing
+  // Catch unknown tools: "AI" + specific design workflow terms
+  const hasAI = text.includes(' ai ') || text.startsWith('ai ') || text.includes(' ai:') || text.includes(' ai,');
+  const hasDesignWorkflow = [
+    'design tool', 'design app', 'design software', 'design platform',
+    'ui tool', 'ux tool', 'prototyping', 'wireframing', 'mockup',
+    'design workflow', 'creative workflow', 'image generation',
+    'text to image', 'video generation', 'design automation',
+    'design assistant', 'design system', 'ui generation', 'ui builder',
+    'website builder', 'landing page', 'design process',
+  ].some(kw => text.includes(kw));
+  if (hasAI && hasDesignWorkflow) return true;
+
+  // Product Hunt: must be a named tool
   if (article.source === 'Product Hunt') {
     return matchesAny(text, DESIGN_AI_TOOLS);
   }
@@ -244,8 +256,9 @@ async function fetchRSS(feed) {
   const articles = [];
   for (let i = 1; i < titles.length; i++) {
     const title = titles[i] || '';
-    // Skip feed-level titles (no link, or title matches feed name, or too short)
     if (!links[i] || title.length < 15) continue;
+    // Skip if title is just the feed name (homepage entry)
+    if (title.toLowerCase().includes(feed.name.toLowerCase())) continue;
     const pub = pubDates[i] || updatedDates[i] || new Date().toISOString();
     articles.push({
       title,
