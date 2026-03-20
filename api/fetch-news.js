@@ -222,40 +222,48 @@ async function fetchProductHunt() {
   }));
 }
 
-// Keywords — ALL must be specifically about digital/visual design
-// Deliberately excludes generic terms like 'brand', 'visual', 'layout'
-// that appear in non-design articles
+// Strict keywords for RSS/GNews — must be specifically about digital design
 const RELEVANCE_KEYWORDS = [
   // Specific roles
   'ux designer', 'ui designer', 'graphic designer', 'product designer',
   'web designer', 'motion designer', 'interaction designer', 'visual designer',
-  'art director', 'creative director', 'brand designer',
+  'art director', 'creative director', 'brand designer', 'designer',
 
   // Specific disciplines
   'user experience', 'user interface', 'ux design', 'ui design',
   'graphic design', 'motion design', 'web design', 'product design',
   'interaction design', 'design system', 'design tool', 'design software',
-  'wireframe', 'prototype', 'design workflow',
+  'wireframe', 'prototype', 'design workflow', 'design industry',
 
-  // Specific tools (named tools only — not generic 'design' or 'ai')
+  // Named tools
   'figma', 'sketch', 'framer', 'webflow', 'canva', 'invision', 'zeplin',
   'illustrator', 'photoshop', 'indesign', 'after effects', 'protopie',
-  'spline', 'principle', 'abstract',
+  'spline', 'principle',
 
-  // Specific AI design tools
+  // Named AI design tools
   'midjourney', 'dall-e', 'stable diffusion', 'firefly', 'adobe firefly',
-  'runway ml', 'leonardo ai', 'ideogram', 'recraft', 'pika labs', 'lovart',
-  'google stitch', 'microsoft designer', 'vibe design',
+  'runway ml', 'ideogram', 'recraft', 'lovart', 'google stitch',
+  'microsoft designer', 'vibe design',
 
-  // Specific signals
+  // Explicit signals
   'designers are cooked', 'designer layoff', 'design layoff',
-  'ai replace designer', 'ai replacing designer',
-  'designers losing jobs', 'design jobs',
+  'ai replace designer', 'ai replacing designer', 'design jobs',
+];
+
+// Looser keywords for Product Hunt — short punchy titles need simpler matching
+const PH_RELEVANCE_KEYWORDS = [
+  'design', 'designer', 'figma', 'ui', 'ux', 'canva', 'framer', 'webflow',
+  'sketch', 'prototype', 'wireframe', 'mockup', 'icon', 'logo', 'font',
+  'typography', 'color', 'illustration', 'motion', 'animation', 'creative',
+  'midjourney', 'dall-e', 'firefly', 'image gen', 'ai art', 'ai image',
+  'text to image', 'generative', 'visual', 'graphic', 'brand', 'landing page',
+  'component', 'asset', 'template', 'style guide', 'design system',
 ];
 
 function isRelevant(article) {
   const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
-  return RELEVANCE_KEYWORDS.some(kw => text.includes(kw));
+  const keywords = article.source === 'Product Hunt' ? PH_RELEVANCE_KEYWORDS : RELEVANCE_KEYWORDS;
+  return keywords.some(kw => text.includes(kw));
 }
 
 function matchesAny(text, keywords) {
