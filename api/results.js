@@ -81,6 +81,10 @@ const DESIGN_AI_ACTIONS = [
   'updated', 'improves', 'expands', 'beta', 'ai-powered', 'powered by ai',
   // General AI + design
   'generate', 'generated', 'generative', 'ai-generated',
+  // Loose but real — catches headlines like "Can Adobe tame AI?"
+  'new ', 'custom model', 'tame ai', 'using ai', 'with ai', 'can ai',
+  'ai tool', 'ai model', 'ai feature', 'ai update', 'ai plugin',
+  'ai integration', 'ai workflow', 'for designers', 'for creatives',
 ];
 
 const LAYOFF_WORDS = [
