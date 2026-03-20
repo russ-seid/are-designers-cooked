@@ -285,6 +285,16 @@ function scoreArticle(article) {
   if (matchesAny(text, SIGNALS.tool_minor.tools) && matchesAny(text, SIGNALS.tool_minor.actions))
     return { score: SIGNALS.tool_minor.score, category: 'tool_minor' };
 
+  // Product Hunt specific — short titles need looser matching
+  // If it's from PH and mentions AI + design together, score it
+  if (article.source === 'Product Hunt') {
+    const hasAI = ['ai', 'artificial intelligence', 'generative', 'llm', 'gpt'].some(kw => text.includes(kw));
+    const hasDesign = ['design', 'designer', 'figma', 'ui', 'ux', 'creative', 'graphic',
+                       'illustration', 'motion', 'prototype', 'wireframe', 'logo', 'font',
+                       'brand', 'visual', 'color', 'icon', 'template'].some(kw => text.includes(kw));
+    if (hasAI && hasDesign) return { score: 10, category: 'tool_minor' };
+  }
+
   return { score: 0, category: null };
 }
 
