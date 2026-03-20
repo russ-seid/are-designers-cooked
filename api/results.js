@@ -3,10 +3,18 @@
 // When Reddit is added, pass the same date to fetchReddit()
 
 const RSS_FEEDS = [
-  { name: 'The Verge - AI',  url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml' },
-  { name: 'The Verge - Tech', url: 'https://www.theverge.com/rss/tech/index.xml' },
-  { name: 'TechCrunch - AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/' },
-  { name: 'Creative Bloq',   url: 'https://www.creativebloq.com/feeds/all' },
+  // AI focused
+  { name: 'The Verge - AI',    url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml' },
+  { name: 'The Verge - Tech',  url: 'https://www.theverge.com/rss/tech/index.xml' },
+  { name: 'TechCrunch - AI',   url: 'https://techcrunch.com/category/artificial-intelligence/feed/' },
+  // Design focused
+  { name: 'Creative Bloq',     url: 'https://www.creativebloq.com/feeds/all' },
+  { name: 'Smashing Magazine', url: 'https://www.smashingmagazine.com/feed/' },
+  { name: 'UX Collective',     url: 'https://uxdesign.cc/feed' },
+  { name: 'Design Shack',      url: 'https://designshack.net/feed/' },
+  // AI tools news
+  { name: 'VentureBeat AI',    url: 'https://venturebeat.com/category/ai/feed/' },
+  { name: 'Ars Technica',      url: 'https://feeds.arstechnica.com/arstechnica/technology-lab' },
 ];
 
 // ── Three categories that count ───────────────────────────
